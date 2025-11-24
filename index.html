@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 The Missing Gold</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 사용자 요청에 따른 폰트 추가 */
+        @font-face {
+            font-family: 'OngleipParkDahyeon';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        /* Use the requested font and set background */
+        body {
+            font-family: 'OngleipParkDahyeon', sans-serif; /* 폰트 적용 */
+            background-color: #fcf8e8; /* Light, warm background */
+        }
+        
+        /* Quiz blank input field style */
+        .quiz-input {
+            border: none;
+            border-bottom: 3px dashed #f6ad55; /* 점선 밑줄 */
+            outline: none;
+            padding: 2px 4px;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+            
+            /* 힌트 제거 요청에 따라 고정 너비 설정 */
+            width: 150px; 
+            min-width: 50px; 
+            max-width: 100%;
+            
+            display: inline-block;
+            margin: 0 4px;
+            font-weight: 700;
+            color: #92400e; /* Dark brown text */
+            background-color: transparent;
+            box-sizing: content-box; 
+            font-family: 'OngleipParkDahyeon', sans-serif; /* 본문과 동일한 폰트 적용 */
+        }
+        /* Correct answer style (Student correctly entered the answer) */
+        .correct {
+            border-bottom: 3px solid #10b981; /* Solid green border on correct */
+            background-color: #ecfdf5;
+            pointer-events: none; /* 정답 시 입력 불가 */
+        }
+        /* Incorrect answer style (Student entered a wrong answer) */
+        .incorrect {
+            border-bottom: 3px solid #ef4444; /* Solid red border on incorrect */
+            background-color: #fef2f2;
+        }
+        /* Revealed answer style (Answer displayed after 3 incorrect attempts) */
+        .revealed {
+            border-bottom: 3px solid #d97706; /* Darker orange/brown border */
+            background-color: #fef3c7; /* Light yellow background for hint */
+            color: #d97706; /* Orange text color for emphasis */
+            pointer-events: none; /* 입력 불가 */
+        }
+
+        .text-section {
+            /* 본문 폰트 적용 */
+            font-family: 'OngleipParkDahyeon', sans-serif !important; 
+            line-height: 2.5; /* Increased line height for readability with inputs */
+            
+            /* 양쪽 정렬 적용 (들여쓰기 제거하여 깔끔하게 정렬) */
+            text-align: justify;
+            text-justify: inter-word;
+            
+            /* 줄바꿈 시 단어 단위로 끊어지도록 설정 (CSS 레벨 처리) */
+            word-break: keep-all; 
+        }
+        .feedback-message {
+            color: #10b981; /* Green for compliments */
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            position: absolute;
+            transform: translateY(-20px);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        /* Style for revealed answer feedback */
+        .revealed-feedback {
+            color: #d97706 !important; /* Orange/brown for revealed answer message */
+        }
+        .visible {
+            opacity: 1;
+            transform: translateY(-35px);
+        }
+        .input-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Quiz Container -->
+    <div id="quiz-container" class="bg-white shadow-2xl rounded-3xl p-6 sm:p-10 w-full max-w-4xl border-4 border-yellow-400">
+        
+        <!-- 제목 -->
+        <h1 class="text-5xl sm:text-6xl font-extrabold text-center text-yellow-900 mb-6 pb-2">
+            📚 The Missing Gold 🕵️
+        </h1>
+        
+        <!-- 지시문 -->
+        <p class="text-left text-gray-700 mb-8 text-2xl">
+            📖 교과서 속 단어나 이름으로 빈칸을 채우세요. ✨
+        </p>
+
+        <!-- Quiz Content (Running Text) -->
+        <div id="quiz-content" class="text-2xl font-serif text-gray-800 p-4 bg-yellow-50 rounded-xl shadow-inner">
+            <p class="text-section">
+                The story begins at <span class="whitespace-nowrap">🏫 
+                <span class="input-wrapper">
+                    <input type="text" id="q1" data-answer="bakersville" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q1" class="feedback-message"></span>
+                </span></span>
+                Middle School. Mr. <span class="whitespace-nowrap">👨‍🏫
+                <span class="input-wrapper">
+                    <input type="text" id="q2" data-answer="reese" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q2" class="feedback-message"></span>
+                </span></span>
+                , the principal, finds that the <span class="whitespace-nowrap">🥇
+                <span class="input-wrapper">
+                    <input type="text" id="q3" data-answer="gold" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q3" class="feedback-message"></span>
+                </span></span>
+                medal for the <span class="whitespace-nowrap">🎤 
+                <span class="input-wrapper">
+                    <input type="text" id="q4" data-answer="talent" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q4" class="feedback-message"></span>
+                </span></span>
+                show has been stolen. The principal quickly runs to find the town's best <span class="whitespace-nowrap">🔎
+                <span class="input-wrapper">
+                    <input type="text" id="q5" data-answer="detective" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q5" class="feedback-message"></span>
+                </span></span>
+                , an eighth-grade student named <span class="whitespace-nowrap">👧
+                <span class="input-wrapper">
+                    <input type="text" id="q6" data-answer="shirley" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q6" class="feedback-message"></span>
+                </span></span>
+                . The thief has broken a window and left a short <span class="whitespace-nowrap">📜
+                <span class="input-wrapper">
+                    <input type="text" id="q7" data-answer="poem" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q7" class="feedback-message"></span>
+                </span></span>
+                .
+                Jocelyn says she saw the thief with <span class="whitespace-nowrap">💇‍♀️ 
+                <span class="input-wrapper">
+                    <input type="text" id="q8" data-answer="short" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q8" class="feedback-message"></span>
+                </span></span>
+                hair run away during the <span class="whitespace-nowrap">⛈️
+                <span class="input-wrapper">
+                    <input type="text" id="q9" data-answer="thunder" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q9" class="feedback-message"></span>
+                </span></span>
+                .
+                Sylvia says she saw a <span class="whitespace-nowrap">👧 
+                <span class="input-wrapper">
+                    <input type="text" id="q10" data-answer="girl" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q10" class="feedback-message"></span>
+                </span></span>
+                next to the case.
+                Harry says he was practicing his <span class="whitespace-nowrap">🕺 
+                <span class="input-wrapper">
+                    <input type="text" id="q11" data-answer="dance" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q11" class="feedback-message"></span>
+                </span></span>
+                and heard nothing because his music was too <span class="whitespace-nowrap">🔊
+                <span class="input-wrapper">
+                    <input type="text" id="q12" data-answer="loud" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q12" class="feedback-message"></span>
+                </span></span>
+                .
+                Shirley thinks that the thief is <span class="whitespace-nowrap">⭐
+                <span class="input-wrapper">
+                    <input type="text" id="q13" data-answer="jocelyn" class="quiz-input" autocomplete="off">
+                    <span id="feedback-q13" class="feedback-message"></span>
+                </span></span>
+                .
+            </p>
+        </div>
+
+        <!-- Check Answers Button -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <button id="check-btn" 
+                    class="w-full sm:w-auto px-8 py-3 bg-yellow-600 text-white font-bold rounded-full shadow-lg hover:bg-yellow-700 transition duration-300 transform hover:scale-105 active:scale-95">
+                Final Score Check 💯
+            </button>
+            <button id="reset-btn" 
+                    class="w-full sm:w-auto px-8 py-3 bg-gray-300 text-gray-800 font-bold rounded-full shadow-lg hover:bg-gray-400 transition duration-300 transform hover:scale-105 active:scale-95">
+                Reset Quiz 🔄
+            </button>
+        </div>
+
+        <!-- Result Message Area -->
+        <div id="result-message" class="mt-8 text-center text-2xl font-bold rounded-xl p-4 hidden transition duration-500">
+            <!-- Results will be displayed here. -->
+        </div>
+
+    </div>
+
+    <script>
+        const checkBtn = document.getElementById('check-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const resultMessage = document.getElementById('result-message');
+        const inputs = document.querySelectorAll('.quiz-input');
+        
+        // 오답 횟수를 저장할 객체와 최대 허용 횟수
+        const incorrectAttempts = {};
+        const MAX_ATTEMPTS = 3;
+
+        // 정답 데이터 (소문자로 통일)
+        const correctAnswers = {
+            'q1': ['bakersville'], 
+            'q2': ['reese'],
+            'q3': ['gold'],
+            'q4': ['talent'], 
+            'q5': ['detective'],
+            'q6': ['shirley'],
+            'q7': ['poem'],
+            'q8': ['short'], 
+            'q9': ['thunder'], 
+            'q10': ['girl'], 
+            'q11': ['dance'], 
+            'q12': ['loud'],
+            'q13': ['jocelyn']
+        };
+
+        const compliments = ["Correct!", "Amazing!", "Got it!", "Perfect!", "Nice!", "Well done!"];
+
+        /**
+         * 사용자 입력 문자열을 정규화합니다. (앞뒤 공백 제거 및 소문자 변환)
+         */
+        function normalizeInput(input) {
+            return input.trim().toLowerCase();
+        }
+
+        /**
+         * 3회 오답 시 정답을 표시하고 필드를 비활성화합니다.
+         */
+        function revealAnswer(input) {
+            const inputId = input.id;
+            const answer = correctAnswers[inputId][0]; 
+            const feedbackElement = document.getElementById(`feedback-${inputId}`);
+
+            // 정답 표시 및 스타일 적용
+            input.value = answer; 
+            input.classList.remove('incorrect');
+            input.classList.add('revealed');    
+            input.disabled = true;
+
+            // 피드백 메시지 표시
+            feedbackElement.textContent = `Answer: ${answer}`;
+            feedbackElement.style.color = "#d97706"; 
+            feedbackElement.classList.add('visible', 'revealed-feedback');
+        }
+
+        /**
+         * 개별 입력 필드를 확인하고 즉각적인 피드백을 제공합니다.
+         */
+        function checkIndividualInput(input) {
+            const inputId = input.id;
+            const userAnswer = normalizeInput(input.value);
+            const answers = correctAnswers[inputId];
+            const feedbackElement = document.getElementById(`feedback-${inputId}`);
+            
+            // 이미 정답 또는 공개된 경우 무시
+            if (input.classList.contains('correct') || input.classList.contains('revealed')) {
+                return;
+            }
+
+            // 입력 필드 초기화
+            input.classList.remove('incorrect');
+            feedbackElement.classList.remove('visible', 'revealed-feedback');
+            feedbackElement.style.color = "#10b981"; 
+
+            if (userAnswer.length === 0) {
+                return;
+            }
+            
+            // 정답 여부 확인
+            if (answers.includes(userAnswer)) {
+                // --- 정답 처리 ---
+                input.classList.add('correct');
+                input.disabled = true; 
+                incorrectAttempts[inputId] = 0; 
+                
+                // 칭찬 멘트 표시
+                const compliment = compliments[Math.floor(Math.random() * compliments.length)];
+                feedbackElement.textContent = compliment;
+                feedbackElement.classList.add('visible');
+                
+            } else {
+                // --- 오답 처리 ---
+                input.classList.add('incorrect');
+                
+                // 오답 횟수 증가
+                incorrectAttempts[inputId] = (incorrectAttempts[inputId] || 0) + 1;
+                
+                if (incorrectAttempts[inputId] >= MAX_ATTEMPTS) {
+                    revealAnswer(input);
+                } else {
+                    // 칭찬 대신 현재 오답 횟수 표시
+                    feedbackElement.textContent = `Try again (${incorrectAttempts[inputId]}/${MAX_ATTEMPTS})`;
+                    feedbackElement.style.color = "#ef4444"; 
+                    feedbackElement.classList.add('visible');
+                }
+            }
+        }
+        
+        // --- 초기화 및 이벤트 리스너 설정 ---
+        inputs.forEach((input, index) => {
+            // 초기 오답 횟수 설정
+            incorrectAttempts[input.id] = 0;
+
+            // input 이벤트: 수정 중에는 채점 상태 초기화
+            input.addEventListener('input', () => {
+                 input.classList.remove('incorrect', 'correct');
+                 
+                 const feedbackElement = document.getElementById(`feedback-${input.id}`);
+                 if (feedbackElement) {
+                     feedbackElement.classList.remove('visible', 'revealed-feedback');
+                     feedbackElement.textContent = '';
+                 }
+            });
+            
+            // Keypress: Enter 키 처리
+            input.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    
+                    // 주의: Enter 키를 누를 때 checkIndividualInput(input)을 여기서 호출하면,
+                    // 포커스가 이동하면서 발생하는 blur 이벤트로 인해 채점이 두 번 발생하게 됩니다. (더블 카운팅 문제)
+                    // 따라서 여기서는 포커스 이동만 수행하고, 실제 채점은 blur 이벤트에 위임합니다.
+                    
+                    // 다음 입력 필드로 포커스 이동
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    } else {
+                        checkBtn.focus();
+                    }
+                }
+            });
+
+            // Blur: 포커스가 나갈 때 채점 (여기가 메인 채점 로직)
+            input.addEventListener('blur', () => {
+                // 값이 비어있지 않을 때만 채점
+                if(input.value.trim() !== "") {
+                    checkIndividualInput(input);
+                }
+            });
+        });
+
+        // --- 일괄 채점 함수 (버튼 클릭 시) ---
+        function checkAllAnswers() {
+            let correctCount = 0;
+            const totalQuestions = inputs.length;
+
+            inputs.forEach(input => {
+                const inputId = input.id;
+                const userAnswer = normalizeInput(input.value);
+                const answers = correctAnswers[inputId];
+                const feedbackElement = document.getElementById(`feedback-${inputId}`);
+                
+                // 이미 정답이거나 공개된 상태라면 패스
+                if (input.classList.contains('correct')) {
+                    correctCount++;
+                    return;
+                }
+                if (input.classList.contains('revealed')) {
+                    return; 
+                }
+
+                // 빈칸인 경우
+                if (userAnswer.length === 0) {
+                    input.classList.add('incorrect');
+                    feedbackElement.textContent = "Empty!";
+                    feedbackElement.style.color = "#ef4444";
+                    feedbackElement.classList.add('visible');
+                    return;
+                }
+
+                // 정답 확인 로직
+                if (answers.includes(userAnswer)) {
+                    input.classList.add('correct');
+                    input.disabled = true; 
+                    correctCount++;
+                } else {
+                    input.classList.add('incorrect');
+                    feedbackElement.textContent = "Incorrect";
+                    feedbackElement.style.color = "#ef4444";
+                    feedbackElement.classList.add('visible');
+                }
+            });
+
+            // 최종 결과 메시지 표시
+            const score = Math.round((correctCount / totalQuestions) * 100);
+            resultMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700', 'bg-green-100', 'text-green-700', 'animate-pulse');
+            
+            if (score === 100) {
+                resultMessage.innerHTML = `🎉 Perfect Score! You know the story inside and out! (${score}%)`;
+                resultMessage.classList.add('bg-green-100', 'text-green-700', 'animate-pulse');
+            } else if (score >= 70) {
+                resultMessage.innerHTML = `👍 Great Job! You got most of the details right. (${score}%)`;
+                resultMessage.classList.add('bg-yellow-100', 'text-yellow-700');
+            } else {
+                resultMessage.innerHTML = `📚 Keep Studying! Check the hints and try again. (${score}%)`;
+                resultMessage.classList.add('bg-red-100', 'text-red-700');
+            }
+            
+            resultMessage.classList.remove('hidden');
+        }
+
+        checkBtn.addEventListener('click', checkAllAnswers);
+
+        resetBtn.addEventListener('click', () => {
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'incorrect', 'revealed');
+                input.disabled = false;
+                incorrectAttempts[input.id] = 0;
+
+                const feedbackElement = document.getElementById(`feedback-${input.id}`);
+                feedbackElement.classList.remove('visible', 'revealed-feedback');
+                feedbackElement.textContent = '';
+                feedbackElement.style.color = "#10b981"; 
+            });
+            resultMessage.classList.add('hidden');
+        });
+
+    </script>
+
+</body>
+</html>
